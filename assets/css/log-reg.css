@@ -1,0 +1,113 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    background: url('../../img/background.png') no-repeat center center fixed; /* Добавляем фон */
+    background-size: cover;
+    color: white;
+    font-family: Arial, sans-serif; /* Шрифт для всего тела */
+}
+
+header {
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 10px 0;
+    text-align: center;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 5%;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+}
+
+h2 {
+    color: #A020F0; /* Фиолетовый цвет заголовка */
+    text-align: center; /* Центрирует заголовок формы */
+}
+
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center; /* Центрирует содержимое по горизонтали */
+    align-items: center; /* Центрирует содержимое по вертикали */
+}
+
+.form-section {
+    max-width: 400px;
+    width: 100%; /* Занимает всю ширину в пределах max-width */
+    padding: 20px;
+    border-radius: 10px;
+    background-color: white; /* Белый фон для формы */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block; /* Убедитесь, что метки отображаются как блочные элементы */
+    margin-bottom: 5px;
+    color: #6a0dad; /* Фиолетовый цвет для меток */
+    font-weight: bold; /* Жирный шрифт */
+    font-size: 16px; /* Размер шрифта */
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 80%; /* Измените ширину, если нужно */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #A020F0; /* Цвет границы при фокусе */
+    outline: none; /* Убираем стандартный фокус */
+}
+
+/* Выравнивание кнопки по центру */
+.submit-button {
+    background-color: #A020F0; /* Фиолетовый цвет */
+    color: white;
+    border: none;
+    border-radius: 20px; /* Скругленные углы */
+    padding: 10px 15px; /* Добавим немного внутреннего отступа */
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 16px;
+    display: block; /* Превращаем кнопку в блочный элемент */
+    margin: 15px auto; /* Центрируем кнопку с помощью отступов */
+}
+
+.submit-button:hover {
+    background-color: #570a9d; /* Темнее фиолетового для эффекта при наведении */
+}
+
+.footer-link {
+    display: block; /* Отображение ссылки в блочном формате */
+    text-align: center; /* Центрирование текста */
+    margin-top: 15px; /* Отступ сверху */
+    color: #6a0dad; /* Цвет ссылки */
+    text-decoration: none; /* Убираем подчеркивание */
+}
+
+footer {
+    background-color: rgba(0, 0, 0, 0.7);
+    text-align: center;
+    padding: 20px;
+    margin-top: 30px;
+}

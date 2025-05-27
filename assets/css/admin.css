@@ -1,0 +1,67 @@
+body {
+    background-color: #f0f0f0; /* Фоновый цвет */
+    font-family: Arial, sans-serif;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: white;
+}
+
+th, td {
+    color: black;
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+button {
+    margin: 10px;
+    padding: 10px 15px;
+    background-color: #A020F0; /* Фиолетовый цвет */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #8B008B; /* Более тёмный фиолетовый при наведении */
+}
+
+img {
+    max-width: 50px;
+    max-height: 50px;
+    border-radius: 5px; /* Скругление углов изображений */
+}
+
+h2, h3 {
+    margin-top: 20px;
+}
+
+/* Стили для списка категорий */
+#categoryList {
+    color: black;
+    list-style-type: none;
+    padding: 0;
+}
+
+#categoryList li {
+    background-color: #f2f2f2;
+    margin: 5px 0;
+    padding: 5px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center; /* Вертикальное выравнивание */
+}
+
+#categoryList input[type="checkbox"] {
+    margin-right: 10px; /* Отступ между чекбоксом и названием категории */
+}
