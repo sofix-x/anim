@@ -1,4 +1,5 @@
 <?php
+session_start();
 // require_once 'assets/vendor/connect.php'; // Используем общий файл подключения
 // $conn уже определен в connect.php
 // session_start() уже вызван в connect.php
