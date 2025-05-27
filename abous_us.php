@@ -1,3 +1,4 @@
+<?php session_start(); // Начало сессии ?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
