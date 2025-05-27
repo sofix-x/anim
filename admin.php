@@ -116,6 +116,14 @@ if (isset($_POST['edit_product'])) {
     $stmt->close();
 }
 
+// Получение всех пользователей для отображения в таблице
+$usersQuery = "SELECT id, username, is_admin FROM users"; // Предполагаем, что есть колонка is_admin
+$usersResult = $mysqli->query($usersQuery);
+$users = [];
+if ($usersResult && $usersResult->num_rows > 0) {
+    $users = $usersResult->fetch_all(MYSQLI_ASSOC);
+}
+
 // Закрытие соединения
 $mysqli->close();
 ?>
@@ -239,6 +247,37 @@ $mysqli->close();
     <?php endforeach; ?>
 </ul>
 
+    </section>
+
+    <section>
+        <h2>Управление пользователями</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Имя пользователя</th>
+                    <th>Статус админа</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($users as $user): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($user['id']) ?></td>
+                        <td><?= htmlspecialchars($user['username']) ?></td>
+                        <td><?= $user['is_admin'] ? 'Да' : 'Нет' ?></td>
+                        <td>
+                            <button onclick="toggleAdmin(<?= $user['id'] ?>, <?= $user['is_admin'] ? 1 : 0 ?>)">
+                                <?= $user['is_admin'] ? 'Убрать админа' : 'Сделать админом' ?>
+                            </button>
+                            <?php if ($user['username'] !== 'admin'): // Нельзя удалить основного админа ?>
+                                <button onclick="deleteUser(<?= $user['id'] ?>)">Удалить</button>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
     </section>
 
     <!-- Модальное окно для добавления товара -->
@@ -396,6 +435,53 @@ $mysqli->close();
             }
         })
         .catch(error => console.error("Ошибка:", error));
+    }
+}
+
+function toggleAdmin(userId, isAdmin) {
+    const action = isAdmin ? 'remove_admin' : 'make_admin';
+    if (confirm(`Вы уверены, что хотите ${isAdmin ? 'убрать права администратора' : 'сделать администратором'} для этого пользователя?`)) {
+        fetch('assets/vendor/toggle_admin.php', { // Новый файл для обработки
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, action: action })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Статус пользователя обновлен.');
+                window.location.reload();
+            } else {
+                alert('Ошибка при обновлении статуса пользователя: ' + (data.error || 'Неизвестная ошибка'));
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert('Произошла ошибка сети.');
+        });
+    }
+}
+
+function deleteUser(userId) {
+    if (confirm('Вы уверены, что хотите удалить этого пользователя? Это действие необратимо.')) {
+        fetch('assets/vendor/delete_user.php', { // Новый файл для обработки
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Пользователь удален.');
+                window.location.reload();
+            } else {
+                alert('Ошибка при удалении пользователя: ' + (data.error || 'Неизвестная ошибка'));
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert('Произошла ошибка сети.');
+        });
     }
 }
 

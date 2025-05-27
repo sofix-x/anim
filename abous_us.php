@@ -47,8 +47,6 @@
             <?php if (isset($_SESSION['username'])): ?>
                 <?php if ($_SESSION['is_admin']): ?>
                     <li><a href="admin.php">Админ панель</a></li>
-                <?php else: ?>
-                    <li><a href="personal_cabinet.php">Личный кабинет</a></li>
                 <?php endif; ?>
                 <li><a href="assets/vendor/logout.php">Выход</a></li>
             <?php else: ?>

@@ -22,26 +22,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Запрос к базе данных
-    $stmt = $mysqli->prepare("SELECT password FROM users WHERE username = ?");
+    $stmt = $mysqli->prepare("SELECT id, password, is_admin FROM users WHERE username = ?"); // Получаем также id и is_admin
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $stmt->store_result();
 
     // Проверка, найден ли пользователь
     if ($stmt->num_rows > 0) {
-        $stmt->bind_result($hashed_password);
+        $stmt->bind_result($user_id, $hashed_password, $is_admin_db); // Связываем user_id и is_admin
         $stmt->fetch();
 
         // Проверка пароля
         if (password_verify($password, $hashed_password)) {
+            $_SESSION['user_id'] = $user_id; // Сохраняем ID пользователя в сессии
             $_SESSION['username'] = $username; // Сохраняем имя пользователя в сессии
-
-            // Проверка на админа
-            if ($username === 'admin') {
-                $_SESSION['is_admin'] = true; // Устанавливаем флаг для админа
-            } else {
-                $_SESSION['is_admin'] = false; // Устанавливаем флаг для обычного пользователя
-            }
+            $_SESSION['is_admin'] = (bool)$is_admin_db; // Устанавливаем флаг админа из БД
 
             header("Location: ../../index.php"); // Перенаправляем на главную страницу
             exit();
