@@ -1,9 +1,10 @@
 <?php
-require_once 'assets/vendor/connect.php'; // Используем общий файл подключения
-// $conn уже определен в connect.php
-// session_start() уже вызван в connect.php
+session_start();
 
-// Проверка на наличие ошибок подключения (может быть избыточной, если connect.php обрабатывает)
+// Подключение к базе данных
+$conn = new mysqli('localhost', 'root', 'root', 'comsugoitoys');
+
+// Проверка на наличие ошибок подключения
 if ($conn->connect_error) {
     die("Ошибка подключения: " . $conn->connect_error);
 }

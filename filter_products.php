@@ -1,9 +1,8 @@
 <?php
-require_once 'assets/vendor/connect.php'; // Используем общий файл подключения
+session_start();
+$conn = new mysqli('localhost', 'root', 'root', 'comsugoitoys');
 
-// $conn уже определен в connect.php
 if ($conn->connect_error) {
-    // Эта проверка может быть избыточной, если connect.php уже обрабатывает ошибки подключения
     die("Ошибка подключения: " . $conn->connect_error);
 }
 

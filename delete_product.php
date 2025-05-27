@@ -1,11 +1,9 @@
 <?php
-require_once 'assets/vendor/connect.php'; // Используем общий файл подключения
-header('Content-Type: application/json'); // Устанавливаем заголовок после подключения
+header('Content-Type: application/json');
+$conn = new mysqli('localhost', 'root', 'root', 'comsugoitoys');
 
-// $conn уже определен в connect.php
 if ($conn->connect_error) {
-    // Эта проверка может быть избыточной, если connect.php уже обрабатывает ошибки подключения
-    echo json_encode(['success' => false, 'error' => "Connection failed: " . $conn->connect_error]);
+    echo json_encode(['success' => false, 'error' => $conn->connect_error]);
     exit;
 }
 

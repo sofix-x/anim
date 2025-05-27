@@ -1,10 +1,11 @@
 <?php
-require_once 'connect.php'; // Используем общий файл подключения
+session_start(); // Начинаем сессию
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // $conn уже определен в connect.php
+    // Подключение к базе данных
+    $conn = new mysqli('localhost', 'root', 'root', 'comsugoitoys');
 
-    // Проверка соединения (аналогично signin.php, можно убрать если connect.php надежно обрабатывает ошибки)
+    // Проверка соединения
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }

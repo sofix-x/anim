@@ -1,4 +1,3 @@
-<?php require_once 'assets/vendor/connect.php'; // Для session_start() и потенциально других общих нужд ?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>

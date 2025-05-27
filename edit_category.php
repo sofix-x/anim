@@ -1,11 +1,9 @@
 <?php
-require_once 'assets/vendor/connect.php'; // Используем общий файл подключения
+session_start();
+$conn = new mysqli('localhost', 'root', 'root', 'comsugoitoys');
 
-// $conn уже определен в connect.php
 if ($conn->connect_error) {
-    // Эта проверка может быть избыточной, если connect.php уже обрабатывает ошибки подключения
-    // For a script that might output JSON, it's better to die with JSON.
-    die(json_encode(['success' => false, 'error' => "Connection failed: " . $conn->connect_error]));
+    die("Connection failed: " . $conn->connect_error);
 }
 
 if (isset($_POST['category_id']) && isset($_POST['category_name'])) {

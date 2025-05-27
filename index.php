@@ -2,7 +2,13 @@
 require_once 'assets/vendor/connect.php'; // Используем общий файл подключения
 // $conn уже определен в connect.php
 // session_start() уже вызван в connect.php
+// Подключение к базе данных
+$db_host = 'localhost';
+$db_name = 'second_site_db'; // Ваше имя БД
+$db_user = 'second_site_user'; // Ваш пользователь БД
+$db_pass = '1'; // Ваш пароль
 
+$mysqli = new mysqli($db_host, $db_user, $db_pass, $db_name);
 // Проверка на наличие сообщений и вывод их (можно оставить здесь или переместить после HTML, если они должны быть в конце)
 
 // Проверка на ошибки подключения (может быть избыточной, если connect.php обрабатывает)
