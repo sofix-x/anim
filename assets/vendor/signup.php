@@ -3,8 +3,13 @@ session_start(); // Начинаем сессию
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Подключение к базе данных
-    $conn = new mysqli('localhost', 'root', 'root', 'comsugoitoys');
+    //$conn = new mysqli('localhost', 'root', 'root', 'comsugoitoys');
+$db_host = 'localhost';
+$db_name = 'second_site_db'; // Ваше имя БД
+$db_user = 'second_site_user'; // Ваш пользователь БД
+$db_pass = '1'; // Ваш пароль
 
+$mysqli = new mysqli($db_host, $db_user, $db_pass, $db_name);
     // Проверка соединения
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
