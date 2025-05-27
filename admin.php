@@ -117,7 +117,7 @@ if (isset($_POST['edit_product'])) {
 }
 
 // Получение всех пользователей для отображения в таблице
-$usersQuery = "SELECT id, username, is_admin FROM users"; // Предполагаем, что есть колонка is_admin
+$usersQuery = "SELECT id, username FROM users"; // Убираем is_admin из запроса
 $usersResult = $mysqli->query($usersQuery);
 $users = [];
 if ($usersResult && $usersResult->num_rows > 0) {
@@ -125,7 +125,17 @@ if ($usersResult && $usersResult->num_rows > 0) {
 }
 
 // Закрытие соединения
-$mysqli->close();
+// $mysqli->close(); // Соединение будет закрыто в конце скрипта, если еще используется
+// Переносим $mysqli->close(); в самый конец PHP блока перед <!DOCTYPE html>
+// или убедимся, что оно вызывается только один раз.
+// Для безопасности, если $mysqli используется только для этих запросов вверху,
+// можно закрыть его здесь, но если есть еще запросы ниже, то нет.
+// Судя по коду, все DB операции вверху, так что можно закрыть.
+// Однако, если $mysqli используется в HTML части (маловероятно для этого файла), то не закрывать.
+// Давайте предположим, что все DB операции завершены.
+// $mysqli->close(); // Закомментируем пока, чтобы убедиться, что нет других использований ниже.
+// Фактически, $mysqli->close() уже есть в конце PHP блока.
+$mysqli->close(); // Ensure the connection is closed here
 ?>
 
 <!DOCTYPE html>
@@ -265,11 +275,8 @@ $mysqli->close();
                     <tr>
                         <td><?= htmlspecialchars($user['id']) ?></td>
                         <td><?= htmlspecialchars($user['username']) ?></td>
-                        <td><?= $user['is_admin'] ? 'Да' : 'Нет' ?></td>
+                        <td><?= ($user['username'] === 'admin') ? 'Да' : 'Нет' ?></td>
                         <td>
-                            <button onclick="toggleAdmin(<?= $user['id'] ?>, <?= $user['is_admin'] ? 1 : 0 ?>)">
-                                <?= $user['is_admin'] ? 'Убрать админа' : 'Сделать админом' ?>
-                            </button>
                             <?php if ($user['username'] !== 'admin'): // Нельзя удалить основного админа ?>
                                 <button onclick="deleteUser(<?= $user['id'] ?>)">Удалить</button>
                             <?php endif; ?>
@@ -438,29 +445,8 @@ $mysqli->close();
     }
 }
 
-function toggleAdmin(userId, isAdmin) {
-    const action = isAdmin ? 'remove_admin' : 'make_admin';
-    if (confirm(`Вы уверены, что хотите ${isAdmin ? 'убрать права администратора' : 'сделать администратором'} для этого пользователя?`)) {
-        fetch('assets/vendor/toggle_admin.php', { // Новый файл для обработки
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: userId, action: action })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Статус пользователя обновлен.');
-                window.location.reload();
-            } else {
-                alert('Ошибка при обновлении статуса пользователя: ' + (data.error || 'Неизвестная ошибка'));
-            }
-        })
-        .catch(error => {
-            console.error('Ошибка:', error);
-            alert('Произошла ошибка сети.');
-        });
-    }
-}
+// Удаляем функцию toggleAdmin, так как она больше не нужна
+// function toggleAdmin(userId, isAdmin) { ... }
 
 function deleteUser(userId) {
     if (confirm('Вы уверены, что хотите удалить этого пользователя? Это действие необратимо.')) {
