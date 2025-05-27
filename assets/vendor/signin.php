@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Запрос к базе данных
-    $stmt = $mysqli->prepare("SELECT id, password, is_admin FROM users WHERE username = ?"); // Получаем id, password и is_admin
+    $stmt = $mysqli->prepare("SELECT id, password FROM users WHERE username = ?"); // Получаем только id и password
     if ($stmt === false) {
         // Залогировать $mysqli->error для отладки на сервере
         $_SESSION['error_message'] = "Произошла ошибка на сервере. Пожалуйста, попробуйте войти позже.";
@@ -36,14 +36,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Проверка, найден ли пользователь
     if ($stmt->num_rows > 0) {
-        $stmt->bind_result($user_id, $hashed_password, $is_admin_from_db); // Связываем user_id, hashed_password и is_admin
+        $stmt->bind_result($user_id, $hashed_password); // Связываем user_id и hashed_password
         $stmt->fetch();
 
         // Проверка пароля
         if (password_verify($password, $hashed_password)) {
             $_SESSION['user_id'] = $user_id; // Сохраняем ID пользователя в сессии
             $_SESSION['username'] = $username; // Сохраняем имя пользователя в сессии
-            $_SESSION['is_admin'] = (bool)$is_admin_from_db; // Устанавливаем флаг админа из БД
+            
+            // Устанавливаем флаг админа на основе имени пользователя
+            if ($username === 'admin') {
+                $_SESSION['is_admin'] = true;
+            } else {
+                $_SESSION['is_admin'] = false;
+            }
             
             $stmt->close();
             $mysqli->close();

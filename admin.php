@@ -117,7 +117,7 @@ if (isset($_POST['edit_product'])) {
 }
 
 // Получение всех пользователей для отображения в таблице
-$usersQuery = "SELECT id, username, is_admin FROM users"; // Включаем is_admin в запрос
+$usersQuery = "SELECT id, username FROM users"; // Убираем is_admin из запроса, т.к. signin.php не использует его
 $usersResult = $mysqli->query($usersQuery);
 $users = [];
 if ($usersResult && $usersResult->num_rows > 0) {
@@ -275,16 +275,13 @@ $mysqli->close(); // Ensure the connection is closed here
                     <tr>
                         <td><?= htmlspecialchars($user['id']) ?></td>
                         <td><?= htmlspecialchars($user['username']) ?></td>
-                        <td><?= !empty($user['is_admin']) ? 'Да' : 'Нет' ?></td>
+                        <td><?= ($user['username'] === 'admin') ? 'Да' : 'Нет' ?></td>
                         <td>
-                            <?php if ($_SESSION['user_id'] != $user['id'] && $user['username'] !== 'admin'): // Нельзя изменять себя и основного админа (username 'admin') ?>
-                                <button onclick="toggleAdmin(<?= $user['id'] ?>, <?= !empty($user['is_admin']) ? 1 : 0 ?>)">
-                                    <?= !empty($user['is_admin']) ? 'Убрать админа' : 'Сделать админом' ?>
-                                </button>
+                            <?php if ($user['username'] !== 'admin'): // Нельзя редактировать или удалять основного админа 'admin' ?>
                                 <button onclick="openEditUserModal(<?= $user['id'] ?>, '<?= htmlspecialchars($user['username'], ENT_QUOTES) ?>')">Редактировать</button>
-                            <?php endif; ?>
-                            <?php if ($_SESSION['user_id'] != $user['id'] && $user['username'] !== 'admin'): // Нельзя удалить основного админа (username 'admin') и себя ?>
-                                <button onclick="deleteUser(<?= $user['id'] ?>)">Удалить</button>
+                                <?php if ($_SESSION['user_id'] != $user['id']): // Нельзя удалить себя ?>
+                                    <button onclick="deleteUser(<?= $user['id'] ?>)">Удалить</button>
+                                <?php endif; ?>
                             <?php endif; ?>
                         </td>
                     </tr>
@@ -526,30 +523,8 @@ document.getElementById("editUserForm")?.addEventListener("submit", function(eve
     });
 });
 
-
-function toggleAdmin(userId, isAdmin) {
-    const action = isAdmin ? 'remove_admin' : 'make_admin';
-    if (confirm(`Вы уверены, что хотите ${isAdmin ? 'убрать права администратора' : 'сделать администратором'} для этого пользователя?`)) {
-        fetch('assets/vendor/toggle_admin.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: userId, action: action })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Статус пользователя обновлен.');
-                window.location.reload();
-            } else {
-                alert('Ошибка при обновлении статуса пользователя: ' + (data.error || 'Неизвестная ошибка'));
-            }
-        })
-        .catch(error => {
-            console.error('Ошибка:', error);
-            alert('Произошла ошибка сети.');
-        });
-    }
-}
+// Функция toggleAdmin удаляется, так как админ статус определяется по username === 'admin'
+// function toggleAdmin(userId, isAdmin) { ... }
 
 function deleteUser(userId) {
     if (confirm('Вы уверены, что хотите удалить этого пользователя? Это действие необратимо.')) {
