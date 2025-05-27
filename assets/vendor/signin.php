@@ -16,7 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Проверка на пустые поля
     if (empty($username) || empty($password)) {
-        echo "Пожалуйста, заполните все поля.";
+        $_SESSION['error_message'] = "Пожалуйста, заполните все поля.";
+        header("Location: ../../login.php");
         exit;
     }
 
@@ -45,13 +46,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: ../../index.php"); // Перенаправляем на главную страницу
             exit();
         } else {
-            echo "Неверный логин или пароль.";
+            $_SESSION['error_message'] = "Неверный логин или пароль. Пожалуйста, попробуйте еще раз.";
+            header("Location: ../../login.php");
+            exit();
         }
     } else {
-        echo "Пользователь не найден.";
+        $_SESSION['error_message'] = "Пользователь с таким логином не найден. Пожалуйста, проверьте введенные данные или зарегистрируйтесь.";
+        header("Location: ../../login.php");
+        exit();
     }
 
-    // Закрытие соединения
+    // Закрытие соединения (этот блок может не достигаться при редиректах выше, но оставим для полноты)
     $stmt->close();
     $mysqli->close();
 }

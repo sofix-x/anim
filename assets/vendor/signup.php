@@ -17,9 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Проверка, чтобы пароли совпадали
     if ($password !== $confirm_password) {
-        $_SESSION['error_message'] = "Пароли не совпадают!";
-        header("Location: ../../login.php"); // Перенаправление на страницу регистрации
-        exit();
+        $_SESSION['error_message'] = "Пароли не совпадают! Пожалуйста, попробуйте еще раз.";
+        header("Location: ../../register.php"); // Перенаправление на страницу регистрации
+        exit(); // Прекращаем выполнение скрипта
     }
 
     // Хеширование пароля
@@ -30,17 +30,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bind_param("ss", $username, $hashed_password);
 
     if ($stmt->execute()) {
-        $_SESSION['success_message'] = "Регистрация успешна!"; // Сохраните сообщение в сессии
+        $_SESSION['success_message'] = "Регистрация успешна! Теперь вы можете войти.";
+        // Закрытие соединения перед редиректом на главную
+        $stmt->close();
+        $mysqli->close();
+        header("Location: ../../index.php"); // Перенаправление на главную страницу
+        exit();
     } else {
-        $_SESSION['error_message'] = "Ошибка: " . $stmt->error; // Сохраните ошибку в сессии
+        $_SESSION['error_message'] = "Ошибка регистрации: " . $stmt->error . " Пожалуйста, попробуйте еще раз.";
+        // Закрытие соединения перед редиректом на регистрацию
+        $stmt->close();
+        $mysqli->close();
+        header("Location: ../../register.php"); // Перенаправление на страницу регистрации в случае ошибки
+        exit();
     }
-
-    // Закрытие соединения
-    $stmt->close();
-    $mysqli->close();
-
-    // Перенаправление на главную страницу
-    header("Location: ../../index.php");
-    exit();
 }
 ?>
