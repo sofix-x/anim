@@ -117,7 +117,7 @@ if (isset($_POST['edit_product'])) {
 }
 
 // Получение всех пользователей для отображения в таблице
-$usersQuery = "SELECT id, username FROM users"; // Убираем is_admin из запроса
+$usersQuery = "SELECT id, username, is_admin FROM users"; // Включаем is_admin в запрос
 $usersResult = $mysqli->query($usersQuery);
 $users = [];
 if ($usersResult && $usersResult->num_rows > 0) {
@@ -275,9 +275,15 @@ $mysqli->close(); // Ensure the connection is closed here
                     <tr>
                         <td><?= htmlspecialchars($user['id']) ?></td>
                         <td><?= htmlspecialchars($user['username']) ?></td>
-                        <td><?= ($user['username'] === 'admin') ? 'Да' : 'Нет' ?></td>
+                        <td><?= !empty($user['is_admin']) ? 'Да' : 'Нет' ?></td>
                         <td>
-                            <?php if ($user['username'] !== 'admin'): // Нельзя удалить основного админа ?>
+                            <?php if ($_SESSION['user_id'] != $user['id'] && $user['username'] !== 'admin'): // Нельзя изменять себя и основного админа (username 'admin') ?>
+                                <button onclick="toggleAdmin(<?= $user['id'] ?>, <?= !empty($user['is_admin']) ? 1 : 0 ?>)">
+                                    <?= !empty($user['is_admin']) ? 'Убрать админа' : 'Сделать админом' ?>
+                                </button>
+                                <button onclick="openEditUserModal(<?= $user['id'] ?>, '<?= htmlspecialchars($user['username'], ENT_QUOTES) ?>')">Редактировать</button>
+                            <?php endif; ?>
+                            <?php if ($_SESSION['user_id'] != $user['id'] && $user['username'] !== 'admin'): // Нельзя удалить основного админа (username 'admin') и себя ?>
                                 <button onclick="deleteUser(<?= $user['id'] ?>)">Удалить</button>
                             <?php endif; ?>
                         </td>
@@ -286,6 +292,26 @@ $mysqli->close(); // Ensure the connection is closed here
             </tbody>
         </table>
     </section>
+
+    <!-- Модальное окно для редактирования пользователя -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeEditUserModal">&times;</span>
+            <h2>Редактировать пользователя</h2>
+            <form id="editUserForm" method="POST">
+                <input type="hidden" name="edit_user_id" id="editUserId">
+                <div>
+                    <label for="editUsername">Имя пользователя:</label>
+                    <input type="text" name="edit_username" id="editUsername" required>
+                </div>
+                <div>
+                    <label for="editPassword">Новый пароль (оставьте пустым, чтобы не менять):</label>
+                    <input type="password" name="edit_password" id="editPassword">
+                </div>
+                <button type="submit" name="save_user_changes">Сохранить изменения</button>
+            </form>
+        </div>
+    </div>
 
     <!-- Модальное окно для добавления товара -->
     <div id="addProductModal" class="modal">
@@ -399,10 +425,13 @@ $mysqli->close(); // Ensure the connection is closed here
     window.onclick = function(event) {
         const productModal = document.getElementById("addProductModal");
         const categoryModal = document.getElementById("addCategoryModal");
+        const editUserModal = document.getElementById("editUserModal"); // Добавляем editUserModal
         if (event.target == productModal) {
             productModal.style.display = "none";
         } else if (event.target == categoryModal) {
             categoryModal.style.display = "none";
+        } else if (event.target == editUserModal) { // Закрытие editUserModal
+            editUserModal.style.display = "none";
         }
     }
 
@@ -445,8 +474,82 @@ $mysqli->close(); // Ensure the connection is closed here
     }
 }
 
-// Удаляем функцию toggleAdmin, так как она больше не нужна
-// function toggleAdmin(userId, isAdmin) { ... }
+// JavaScript для модального окна редактирования пользователя
+const editUserModal = document.getElementById("editUserModal");
+const closeEditUserModalBtn = document.getElementById("closeEditUserModal");
+
+function openEditUserModal(userId, username) {
+    document.getElementById("editUserId").value = userId;
+    document.getElementById("editUsername").value = username;
+    document.getElementById("editPassword").value = ""; // Очищаем поле пароля
+    editUserModal.style.display = "block";
+}
+
+if(closeEditUserModalBtn) {
+    closeEditUserModalBtn.onclick = function() {
+        editUserModal.style.display = "none";
+    }
+}
+
+document.getElementById("editUserForm")?.addEventListener("submit", function(event) {
+    event.preventDefault();
+    const userId = document.getElementById("editUserId").value;
+    const username = document.getElementById("editUsername").value;
+    const password = document.getElementById("editPassword").value;
+
+    const formData = {
+        user_id: userId,
+        username: username
+    };
+    if (password) {
+        formData.password = password;
+    }
+
+    fetch('assets/vendor/edit_user.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Данные пользователя обновлены.');
+            editUserModal.style.display = "none";
+            window.location.reload();
+        } else {
+            alert('Ошибка при обновлении данных: ' + (data.error || 'Неизвестная ошибка'));
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка сети при обновлении пользователя.');
+    });
+});
+
+
+function toggleAdmin(userId, isAdmin) {
+    const action = isAdmin ? 'remove_admin' : 'make_admin';
+    if (confirm(`Вы уверены, что хотите ${isAdmin ? 'убрать права администратора' : 'сделать администратором'} для этого пользователя?`)) {
+        fetch('assets/vendor/toggle_admin.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, action: action })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Статус пользователя обновлен.');
+                window.location.reload();
+            } else {
+                alert('Ошибка при обновлении статуса пользователя: ' + (data.error || 'Неизвестная ошибка'));
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert('Произошла ошибка сети.');
+        });
+    }
+}
 
 function deleteUser(userId) {
     if (confirm('Вы уверены, что хотите удалить этого пользователя? Это действие необратимо.')) {
