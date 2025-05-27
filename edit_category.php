@@ -1,16 +1,16 @@
 <?php
 session_start();
-$conn = new mysqli('localhost', 'root', 'root', 'comsugoitoys');
+include 'db_connection.php'; // Используем централизованное подключение
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if ($mysqli->connect_error) {
+    die("Connection failed: " . $mysqli->connect_error);
 }
 
 if (isset($_POST['category_id']) && isset($_POST['category_name'])) {
     $category_id = $_POST['category_id'];
     $category_name = $_POST['category_name'];
 
-    $stmt = $conn->prepare("UPDATE categories SET name = ? WHERE id = ?");
+    $stmt = $mysqli->prepare("UPDATE categories SET name = ? WHERE id = ?");
     $stmt->bind_param("si", $category_name, $category_id);
 
     if ($stmt->execute()) {
@@ -23,5 +23,5 @@ if (isset($_POST['category_id']) && isset($_POST['category_name'])) {
 }
 header("Location: admin.php");
 
-$conn->close();
+$mysqli->close();
 ?>

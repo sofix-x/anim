@@ -1,14 +1,14 @@
 <?php
 session_start();
-$conn = new mysqli('localhost', 'root', 'root', 'comsugoitoys');
+include 'db_connection.php'; // Используем централизованное подключение
 
-if ($conn->connect_error) {
-    die("Ошибка подключения: " . $conn->connect_error);
+if ($mysqli->connect_error) {
+    die("Ошибка подключения: " . $mysqli->connect_error);
 }
 
 // Получение всех товаров из базы данных
 $productQuery = "SELECT * FROM products";
-$productResult = $conn->query($productQuery);
+$productResult = $mysqli->query($productQuery);
 
 $filteredProducts = [];
 if ($productResult->num_rows > 0) {

@@ -2,20 +2,20 @@
 session_start();
 
 // Подключение к базе данных
-$conn = new mysqli('localhost', 'root', 'root', 'comsugoitoys');
+include 'db_connection.php'; // Используем централизованное подключение
 
 // Проверка на наличие ошибок подключения
-if ($conn->connect_error) {
-    die("Ошибка подключения: " . $conn->connect_error);
+if ($mysqli->connect_error) {
+    die("Ошибка подключения: " . $mysqli->connect_error);
 }
 
 // Получение всех категорий для фильтрации
 $categoryQuery = "SELECT * FROM categories";
-$categoryResult = $conn->query($categoryQuery);
+$categoryResult = $mysqli->query($categoryQuery);
 
 // Получение всех товаров из базы данных
 $productQuery = "SELECT * FROM products";
-$productResult = $conn->query($productQuery);
+$productResult = $mysqli->query($productQuery);
 
 // Получение всех товаров с фильтрацией
 $filteredProducts = [];

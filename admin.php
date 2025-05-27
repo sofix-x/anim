@@ -1,13 +1,7 @@
 <?php
 session_start(); // Начинаем сессию
 
-// Подключение к базе данных
-$conn = new mysqli('localhost', 'root', 'root', 'comsugoitoys');
-
-// Проверка соединения
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include 'db_connection.php'; // Используем централизованное подключение
 
 // Проверка, отправлена ли форма для добавления товара
 if (isset($_POST['add_product'])) {
@@ -25,7 +19,7 @@ if (isset($_POST['add_product'])) {
     }
 
     // Вставка товара в базу данных
-    $stmt = $conn->prepare("INSERT INTO products (name, price, description, image, category_id) VALUES (?, ?, ?, ?, ?)");
+    $stmt = $mysqli->prepare("INSERT INTO products (name, price, description, image, category_id) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("sdssi", $name, $price, $description, $image, $category_id);
 
     if ($stmt->execute()) {
@@ -42,7 +36,7 @@ if (isset($_POST['add_category'])) {
     $category_name = $_POST['category_name'];
 
     // Вставка категории в базу данных
-    $stmt = $conn->prepare("INSERT INTO categories (name) VALUES (?)");
+    $stmt = $mysqli->prepare("INSERT INTO categories (name) VALUES (?)");
     $stmt->bind_param("s", $category_name);
 
     if ($stmt->execute()) {
@@ -56,7 +50,7 @@ if (isset($_POST['add_category'])) {
 
 // Получение категорий для выпадающего списка
 $query = "SELECT id, name FROM categories";
-$result = $conn->query($query);
+$result = $mysqli->query($query);
 $categories = [];
 if ($result->num_rows > 0) {
     $categories = $result->fetch_all(MYSQLI_ASSOC);
@@ -68,7 +62,7 @@ $query = "
     FROM products p 
     JOIN categories c ON p.category_id = c.id
 ";
-$result = $conn->query($query);
+$result = $mysqli->query($query);
 $products = [];
 if ($result->num_rows > 0) {
     $products = $result->fetch_all(MYSQLI_ASSOC);
@@ -101,7 +95,7 @@ if (isset($_POST['edit_product'])) {
     } else {
         // Если изображение не загружено, используем текущее изображение
         $query = "SELECT image FROM products WHERE id = ?";
-        $stmt = $conn->prepare($query);
+        $stmt = $mysqli->prepare($query);
         $stmt->bind_param("i", $product_id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -110,7 +104,7 @@ if (isset($_POST['edit_product'])) {
     }
 
     // Обновление товара в базе данных
-    $stmt = $conn->prepare("UPDATE products SET name = ?, price = ?, description = ?, image = ?, category_id = ? WHERE id = ?");
+    $stmt = $mysqli->prepare("UPDATE products SET name = ?, price = ?, description = ?, image = ?, category_id = ? WHERE id = ?");
     $stmt->bind_param("sdssii", $name, $price, $description, $image, $category_id, $product_id);
 
     if ($stmt->execute()) {
@@ -123,7 +117,7 @@ if (isset($_POST['edit_product'])) {
 }
 
 // Закрытие соединения
-$conn->close();
+$mysqli->close();
 ?>
 
 <!DOCTYPE html>

@@ -3,16 +3,11 @@ session_start(); // Начинаем сессию
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Подключение к базе данных
-    //$conn = new mysqli('localhost', 'root', 'root', 'comsugoitoys');
-$db_host = 'localhost';
-$db_name = 'second_site_db'; // Ваше имя БД
-$db_user = 'second_site_user'; // Ваш пользователь БД
-$db_pass = '1'; // Ваш пароль
+    include '../../db_connection.php'; // Используем централизованное подключение
 
-$mysqli = new mysqli($db_host, $db_user, $db_pass, $db_name);
     // Проверка соединения
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
+    if ($mysqli->connect_error) {
+        die("Connection failed: " . $mysqli->connect_error);
     }
 
     // Получение данных из формы
@@ -31,7 +26,7 @@ $mysqli = new mysqli($db_host, $db_user, $db_pass, $db_name);
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     // Вставка данных в базу
-    $stmt = $conn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+    $stmt = $mysqli->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
     $stmt->bind_param("ss", $username, $hashed_password);
 
     if ($stmt->execute()) {
@@ -42,7 +37,7 @@ $mysqli = new mysqli($db_host, $db_user, $db_pass, $db_name);
 
     // Закрытие соединения
     $stmt->close();
-    $conn->close();
+    $mysqli->close();
 
     // Перенаправление на главную страницу
     header("Location: ../../index.php");

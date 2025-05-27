@@ -3,11 +3,11 @@ session_start(); // Начинаем сессию
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Подключение к базе данных
-    $conn = new mysqli('localhost', 'root', 'root', 'comsugoitoys');
+    include '../../db_connection.php'; // Используем централизованное подключение
 
     // Проверка соединения
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
+    if ($mysqli->connect_error) {
+        die("Connection failed: " . $mysqli->connect_error);
     }
 
     // Получение данных из формы
@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Запрос к базе данных
-    $stmt = $conn->prepare("SELECT password FROM users WHERE username = ?");
+    $stmt = $mysqli->prepare("SELECT password FROM users WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $stmt->store_result();
@@ -53,6 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Закрытие соединения
     $stmt->close();
-    $conn->close();
+    $mysqli->close();
 }
 ?>
