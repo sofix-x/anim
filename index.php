@@ -1,8 +1,7 @@
 <?php
 session_start();
-// require_once 'assets/vendor/connect.php'; // Используем общий файл подключения
-// $conn уже определен в connect.php
-// session_start() уже вызван в connect.php
+// Проверка на наличие сообщений и вывод их
+
 // Подключение к базе данных
 $db_host = 'localhost';
 $db_name = 'second_site_db'; // Ваше имя БД
@@ -10,16 +9,15 @@ $db_user = 'second_site_user'; // Ваш пользователь БД
 $db_pass = '1'; // Ваш пароль
 
 $mysqli = new mysqli($db_host, $db_user, $db_pass, $db_name);
-// Проверка на наличие сообщений и вывод их (можно оставить здесь или переместить после HTML, если они должны быть в конце)
 
-// Проверка на ошибки подключения (может быть избыточной, если connect.php обрабатывает)
-if ($conn->connect_error) {
-    die("Ошибка подключения: " . $conn->connect_error);
+// Проверка на ошибки подключения
+if ($mysqli->connect_error) {
+    die("Ошибка подключения: " . $mysqli->connect_error);
 }
 
 // Запрос на получение первых 4 товаров
 $sql = "SELECT name, description, price, image FROM products LIMIT 4";
-$result = $conn->query($sql); // Используем $conn вместо $mysqli
+$result = $mysqli->query($sql);
 
 ?>
 
@@ -200,10 +198,8 @@ $result = $conn->query($sql); // Используем $conn вместо $mysqli
 </html>
 <?php
 // Освобождение ресурсов
-if ($result) { // Проверяем, что $result не false (в случае ошибки запроса)
-    $result->close();
-}
-$conn->close(); // Используем $conn вместо $mysqli
+$result->close();
+$mysqli->close();
 
 if (isset($_SESSION['success_message'])) {
     echo "<script>alert('" . $_SESSION['success_message'] . "');</script>";
